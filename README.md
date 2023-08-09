@@ -26,6 +26,29 @@
 
 *В качестве ответа  пришлите снимки экрана домашнего каталога пользователя с исходными и зашифрованными данными.*  
 
+#### Ответ
+
+```
+sudo apt update
+sudo apt install -y ecryptfs-utils
+
+sudo adduser user1
+sudo usermod -aG sudo user1
+
+
+sudo ls -al /home/user1
+sudo ecryptfs-migrate-home -u user1 #Миграция домашнего каталога пользователя cryptouser
+sudo ls -al /home/user1
+```
+
+#### Скриншот выполнения ls -al /home/cryptouser до шифрования
+
+![img](img/1.1.PNG)
+
+#### Скриншот выполнения ls -al /home/cryptouser после шифрования
+
+![img](img/1.2.PNG)
+
 ### Задание 2
 
 1. Установите поддержку **LUKS**.
@@ -34,19 +57,30 @@
 
 *В качестве ответа пришлите снимки экрана с поэтапным выполнением задания.*
 
+#### Ответ
 
-## Дополнительные задания (со звёздочкой*)
+```
+apt list gparted cryptsetup #LUKS (gparted) и cryptsetup установлены по умолчанию
+#sudo apt install -y gparted cryptsetup
+cryptsetup --version
 
-Эти задания дополнительные, то есть не обязательные к выполнению, и никак не повлияют на получение вами зачёта по этому домашнему заданию. Вы можете их выполнить, если хотите глубже шире разобраться в материале
+sudo fdisk -l
+sudo cryptsetup -y -v --type luks2 luksFormat /dev/vdb #Подготавливаем раздел (luksFormat)
+sudo cryptsetup luksOpen /dev/vdb disk #Открываем раздел
+ls /dev/mapper/disk
 
-### Задание 3 *
+sudo dd if=/dev/zero of=/dev/mapper/disk
+sudo mkfs.ext4 /dev/mapper/disk
 
-1. Установите **apparmor**.
-2. Повторите эксперимент, указанный в лекции.
-3. Отключите (удалите) apparmor.
+mkdir .secret 
+sudo mount /dev/mapper/disk .secret/ #Монтируем раздел
 
+sudo umount .secret
+sudo cryptsetup luksClose disk #Закрываем раздел
+```
 
-*В качестве ответа пришлите снимки экрана с поэтапным выполнением задания.*
+#### Скриншот поэтапного выполнения
 
+![img](img/2.1.PNG)
 
 
